@@ -1,4 +1,3 @@
-// src/components/WrongLetters.tsx
 import React from 'react';
 
 type WrongLettersProps = {
@@ -8,7 +7,7 @@ type WrongLettersProps = {
 const WrongLetters: React.FC<WrongLettersProps> = ({ letters }) => {
     return (
         <div>
-            <p>Lettres fausses: {letters.join(', ')}</p>
+            <p>Lettres fausses : {letters.join(', ')}</p>
         </div>
     );
 };

@@ -1,13 +1,13 @@
-// src/App.tsx
 import React from 'react';
 import Game from "./Game";
+import './Styles.css';
 
 
 const App: React.FC = () => {
-    console.log("App rendering"); // Vérifie que cela s'affiche dans la console
+    console.log("App rendering");
     return (
         <div className="app">
-            <h1>Jeu de Pendu</h1>
+            <h1>Jeu du Pendu</h1>
             <Game />
         </div>
     );

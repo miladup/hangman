@@ -1,18 +1,17 @@
-// src/components/Game.tsx
 import React, { useState, useEffect } from 'react';
-import WordDisplay from './components/WordDisplay'; // Chemin mis à jour pour pointer vers le dossier components
-import Keyboard from './components/Keyboard'; // Chemin mis à jour
-import HangmanFigure from './components/HangmanFigure'; // Chemin mis à jour
-import GameResult from './components/GameResult'; // Chemin mis à jour
-import WrongLetters from './components/WrongLetters'; // Chemin mis à jour
-import { fetchData } from './api';  // Assure-toi que cette méthode existe dans ton fichier api.tsx, chemin mis à jour
+import WordDisplay from './components/WordDisplay';
+import Keyboard from './components/Keyboard';
+import HangmanFigure from './components/HangmanFigure';
+import GameResult from './components/GameResult';
+import WrongLetters from './components/WrongLetters';
+import { fetchData } from './api';
 
 const Game: React.FC = () => {
     const [word, setWord] = useState<string>('');
     const [guessedLetters, setGuessedLetters] = useState<Set<string>>(new Set());
     const [wrongLetters, setWrongLetters] = useState<Set<string>>(new Set());
     const [errors, setErrors] = useState<number>(0);
-    const maxErrors = 8;
+    const maxParts = 6;
 
     useEffect(() => {
         loadWord();
@@ -21,11 +20,20 @@ const Game: React.FC = () => {
     const loadWord = async () => {
         try {
             const data = await fetchData();
-            setWord(data.word.toUpperCase());
+            const rawWord = data.word.toUpperCase();
+            const formattedWord = rawWord.replace(/-/g, ' ');
+            setWord(formattedWord);
+    
+            const initialGuessed = new Set<string>();
+            if (formattedWord.includes(' ')) {
+                initialGuessed.add(' ');
+            }
+            setGuessedLetters(initialGuessed);
         } catch (error) {
             console.error("Failed to fetch word:", error);
         }
     };
+    
 
     const handleGuess = (letter: string) => {
         const normalizedLetter = letter.toUpperCase();
@@ -41,19 +49,19 @@ const Game: React.FC = () => {
         setGuessedLetters(new Set());
         setWrongLetters(new Set());
         setErrors(0);
-        loadWord();  // Recharge un nouveau mot
+        loadWord();
     };
 
     const hasWon = word.split('').every(letter => guessedLetters.has(letter));
-    const hasLost = errors >= maxErrors;
+    const hasLost = errors >= maxParts;
 
     return (
         <div className="Game">
-            <HangmanFigure attempts={errors} />
+            <HangmanFigure wrongGuessCount={errors} />
             <WordDisplay word={word} guessedLetters={guessedLetters} />
             <Keyboard onGuess={handleGuess} guessedLetters={new Set([...guessedLetters, ...wrongLetters])} />
             <WrongLetters letters={Array.from(wrongLetters)} />
-            <GameResult hasWon={hasWon} onRestart={restartGame} />
+            <GameResult hasWon={hasWon ? true : hasLost ? false : null} onRestart={restartGame} />
         </div>
     );
 };
